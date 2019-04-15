@@ -1,5 +1,5 @@
 {
-  "name": "meteorbuilder",
+  "name": "@saltzmanjoelh/meteor-deployer",
   "version": "1.0.0",
   "description": "Build a meteor.js bundle and optionally package it into a docker image.",
   "main": "dist/index.js",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/saltzmanjoelh/MeteorBuilder.git"
+    "url": "git+https://github.com/saltzmanjoelh/meteor-deployer.git"
   },
   "keywords": [
     "meteor",
@@ -19,9 +19,9 @@
   "author": "Joel Saltzman",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/saltzmanjoelh/MeteorBuilder/issues"
+    "url": "https://github.com/saltzmanjoelh/meteor-deployer/issues"
   },
-  "homepage": "https://github.com/saltzmanjoelh/MeteorBuilder#readme",
+  "homepage": "https://github.com/saltzmanjoelh/meteor-deployer#readme",
   "devDependencies": {
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.6",
