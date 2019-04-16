@@ -22,7 +22,7 @@ class MeteorDeployer {
      */
     constructor(settingsPath: string, buildPath: string) {
         this.settingsPath = settingsPath;
-        this.settings = MeteorSettings.parseConfigFile(settingsPath);
+        this.settings = MeteorSettings.parseSettingsFile(settingsPath);
         this.buildPath = buildPath;
     }
 
