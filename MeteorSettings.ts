@@ -1,7 +1,8 @@
 import * as fs from 'fs';
-import * as path from 'path'
+import * as path from 'path';
+import { Logger } from './Logger';
 
-export default class MeteorSettings {
+class MeteorSettings {
     /**
      * @property {string} filePath Location of deployment settings json file. Typically production.json
      * @property {string} name The name of your application
@@ -29,7 +30,7 @@ export default class MeteorSettings {
         if(filePath == '' || !fs.existsSync(filePath)){
             throw `Invalid path to meteor settings file: ${filePath}`;
         }
-        console.log(`=> Parsing deployment settings at path: ${filePath}`);
+        Logger.log(`=> Parsing deployment settings at path: ${filePath}`);
         let settingsPath = (path.isAbsolute(filePath))? filePath : path.join(process.cwd(), filePath);
         const json = fs.readFileSync(settingsPath, 'utf8');
         return JSON.parse(json);
@@ -65,3 +66,4 @@ export default class MeteorSettings {
     }
     
 }
+export { MeteorSettings };
