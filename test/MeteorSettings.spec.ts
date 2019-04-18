@@ -28,7 +28,7 @@ describe('MeteorSettings.parseSettingsFile()', () => {
     });
 });
 
-describe('validateProperties function', () => {
+describe('MeteorSettings.validateProperties()', () => {
 
     it('should not throw error with valid properties', () => {
         assert.doesNotThrow(() => {

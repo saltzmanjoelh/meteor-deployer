@@ -6,7 +6,7 @@ import { assert } from 'chai';
 import * as sinon from 'sinon';
 import * as child_process from 'child_process';
 
-describe('constructor function', () => {
+describe('MeteorDeployer constructor', () => {
     it('should initialize properties', () => {
         const buildPath = '/some/path';
         
@@ -17,7 +17,7 @@ describe('constructor function', () => {
     });
 });
 
-describe('createBuild function', () => {
+describe('MeteorDeployer.createBuild()', () => {
     it('should execute build command', () => {
         const callback = sinon.fake();
         sinon.stub(child_process, 'execSync').callsFake(callback);
