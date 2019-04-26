@@ -1,6 +1,6 @@
 {
   "name": "@saltzmanjoelh/meteor-deployer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Build a meteor.js bundle and optionally package it into a docker image.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

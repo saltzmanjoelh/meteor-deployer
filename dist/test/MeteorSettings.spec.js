@@ -6,6 +6,7 @@ const MeteorSettingsFixture_1 = require("./MeteorSettingsFixture");
 const chai_1 = require("chai");
 const sinon = require("sinon");
 const fs = require("fs");
+const path = require("path");
 afterEach(() => {
     // Restore the default sandbox here
     sinon.restore();
@@ -21,10 +22,19 @@ describe('MeteorSettings.parseSettingsFile()', () => {
             MeteorSettings_1.MeteorSettings.parseSettingsFile('invalid path');
         });
     });
-    it('should return MeteorSettings with valid file', () => {
+    it('should return MeteorSettings with absolute path', () => {
         const json = `${JSON.stringify(MeteorSettingsFixture_1.default)}`;
         sinon.stub(fs, 'existsSync').returns(true);
         sinon.stub(fs, 'readFileSync').returns(json);
+        chai_1.assert.doesNotThrow(() => {
+            MeteorSettings_1.MeteorSettings.parseSettingsFile('/path');
+        });
+    });
+    it('should return MeteorSettings with relative path', () => {
+        const json = `${JSON.stringify(MeteorSettingsFixture_1.default)}`;
+        sinon.stub(fs, 'existsSync').returns(true);
+        sinon.stub(fs, 'readFileSync').returns(json);
+        sinon.stub(path, 'isAbsolute').returns(false);
         chai_1.assert.doesNotThrow(() => {
             MeteorSettings_1.MeteorSettings.parseSettingsFile('path');
         });
