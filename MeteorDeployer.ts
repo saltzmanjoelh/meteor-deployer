@@ -16,8 +16,8 @@ class MeteorDeployer {
 
     /**
      * Decodes the settings file at settingsPath into the settings property. `buildPath` is stored for use later
-     * @param {string} Path to the settings file passed with `meteor --setting production.json`
-     * @param {string} Path to where you want the bundle built at
+     * @param {MeteorSettings} settings `MeteorSettings` that have been parsed to be used with the build process.
+     * @param {string} buildPath Path to where you want the bundle built at
      */
     constructor(settings: MeteorSettings, buildPath: string) {
         this.settings = settings;
@@ -29,8 +29,9 @@ class MeteorDeployer {
      */
     createBuild() {
         Logger.log('=> Creating Bundle');
+        fs.accessSync(this.buildPath, fs.constants.W_OK);
         const destination = path.join(this.buildPath, this.settings.name);
-        const command = `meteor build --allow-superuser --directory ${destination} --server http://${this.settings.ROOT_URL}:${this.settings.PORT}`;
+        const command = `meteor build --allow-superuser --directory ${destination} --server ${this.settings.ROOT_URL}:${this.settings.PORT}`;
         execSync(command, {stdio: 'inherit'});
     }
     /**
@@ -38,19 +39,21 @@ class MeteorDeployer {
      */
     copySettings() {
         Logger.log('=> Copying settings file');
+        fs.accessSync(this.buildPath, fs.constants.W_OK);
         const destination = path.join(this.buildPath, this.settings.name, 'bundle', 'settings.json');
         fs.copyFileSync(this.settings.filePath, destination);
         Logger.log(`\t${this.settings.filePath} copied to ${destination}`);
     }
     /**
      * Creates the `package.json` file at the root of the bundle for launching the app.
+     * @param {string} version Version number to be used in the package.json file
      */
-    createPackageFile() {
+    createPackageFile(version: string = '1.0.0') {
         Logger.log('=> Creating package.json');
         
         const packageFile = {
             'name': 'app',
-            'version': '1.0.0',
+            'version': version,
             'scripts': {
                 'start': 'METEOR_SETTINGS=$(cat settings.json) node main.js'
             }

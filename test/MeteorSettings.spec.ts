@@ -6,6 +6,11 @@ import { assert } from 'chai';
 import * as sinon from 'sinon';
 import * as fs from 'fs';
 
+afterEach(() => {
+    // Restore the default sandbox here
+    sinon.restore();
+  });
+
 describe('MeteorSettings.parseSettingsFile()', () => {
     it('should throw with empty path', () => {
         assert.throws(() => {

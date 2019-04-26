@@ -2,14 +2,17 @@ class Logger {
     /**
      * @property {boolean} shouldLog If we should be logging to console or not.
      */
-    static shouldLog: boolean = process.env['npm_lifecycle_event'] != 'test';
+    static shouldSkipLogging: boolean = process.env['npm_lifecycle_event'] == 'test' || (process.env['VSCODE_PID'] != undefined);
     /**
      * Prints to `stdout` with newline.
      */
     static log(message: string) {
-        if(this.shouldLog){
-            console.log(message);
+        if(this.shouldSkipLogging){
+            return;
         }
+        console.log(process.env['npm_lifecycle_event']);
+        console.log(process.env['VSCODE_PID']);
+        console.log(message);
     }
 }
 export { Logger };
