@@ -1,6 +1,6 @@
 'use strict';
 import 'mocha';
-import { MeteorDeployer } from '../MeteorDeployer';
+import { MeteorDeployer } from '../src/MeteorDeployer';
 import MeteorSettingsFixture from './MeteorSettingsFixture';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
@@ -96,5 +96,34 @@ describe('MeteorDeployer.createPackageFile()', () => {
         assert.isTrue(callback.calledOnce);
         const file: string = callback.args[0][1];
         assert.isTrue(file.includes(version), `File contents: ${file} should have contained version: ${version}`);
+    });
+});
+
+describe('MeteorDeployer.createDockerfile()', () => {
+    it('should create Dockerfile', () => {
+        const callback = sinon.fake();
+        sinon.stub(fs, 'writeFileSync').callsFake(callback);
+        const deployer = new MeteorDeployer(MeteorSettingsFixture, '/some/path');
+        
+        deployer.createDockerfile();
+
+        assert.isTrue(callback.calledOnce);
+        const file: string = callback.args[0][1];
+        assert.isTrue(file.includes(MeteorSettingsFixture.MONGO_URL), `Dockerfile: ${file} should have contained MONGO_URL: ${MeteorSettingsFixture.MONGO_URL}`);
+        assert.isTrue(file.includes(MeteorSettingsFixture.ROOT_URL), `Dockerfile: ${file} should have contained ROOT_URL: ${MeteorSettingsFixture.ROOT_URL}`);
+        assert.isTrue(file.includes(MeteorSettingsFixture.MONGO_URL), `Dockerfile: ${file} should have contained PORT: ${MeteorSettingsFixture.PORT}`);
+    });
+    it('should create Dockerfile in the bundle', () => {
+        const callback = sinon.fake();
+        sinon.stub(fs, 'writeFileSync').callsFake(callback);
+        const deployer = new MeteorDeployer(MeteorSettingsFixture, '/some/path');
+        
+        deployer.createDockerfile();
+
+        assert.isTrue(callback.calledOnce);
+        const destination: string = callback.args[0][0];
+        assert.isTrue(destination.includes(deployer.buildPath), `Destination: ${destination} should have contained the buildPath: ${deployer.buildPath}`);
+        assert.isTrue(destination.includes('bundle'));
+        assert.isTrue(destination.includes('Dockerfile'));
     });
 });

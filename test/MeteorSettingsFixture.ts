@@ -1,4 +1,4 @@
-import { MeteorSettings } from '../MeteorSettings';
+import { MeteorSettings } from '../src/MeteorSettings';
 
 const MeteorSettingsFixture = new MeteorSettings();
 MeteorSettingsFixture.name = 'Example App';

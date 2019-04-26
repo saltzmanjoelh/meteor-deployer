@@ -1,10 +1,11 @@
 'use strict';
 import 'mocha';
-import { MeteorSettings } from '../MeteorSettings';
+import { MeteorSettings } from '../src/MeteorSettings';
 import MeteorSettingsFixture from './MeteorSettingsFixture';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 import * as fs from 'fs';
+import * as path from 'path';
 
 afterEach(() => {
     // Restore the default sandbox here
@@ -22,10 +23,20 @@ describe('MeteorSettings.parseSettingsFile()', () => {
             MeteorSettings.parseSettingsFile('invalid path');
         });
     });
-    it('should return MeteorSettings with valid file', () => {
+    it('should return MeteorSettings with absolute path', () => {
         const json = `${JSON.stringify(MeteorSettingsFixture)}`;
         sinon.stub(fs, 'existsSync').returns(true);
         sinon.stub(fs, 'readFileSync').returns(json);
+
+        assert.doesNotThrow(() => {
+            MeteorSettings.parseSettingsFile('/path');
+        });
+    });
+    it('should return MeteorSettings with relative path', () => {
+        const json = `${JSON.stringify(MeteorSettingsFixture)}`;
+        sinon.stub(fs, 'existsSync').returns(true);
+        sinon.stub(fs, 'readFileSync').returns(json);
+        sinon.stub(path, 'isAbsolute').returns(false);
 
         assert.doesNotThrow(() => {
             MeteorSettings.parseSettingsFile('path');
