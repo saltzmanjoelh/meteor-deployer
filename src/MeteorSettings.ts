@@ -10,11 +10,11 @@ class MeteorSettings {
      * @property {string} PORT The port your app uses to access Meteor. (3000)
      * @property {string} MONGO_URL The url that the app uses to access Mongo DB (mongodb+srv://user:password@cluster1.mongodb.net)
      */
-    filePath: string = '';
-    name: string = '';
-    ROOT_URL: string = '';
-    PORT: string = '';
-    MONGO_URL: string = '';
+    public filePath: string = '';
+    public name: string = '';
+    public ROOT_URL: string = '';
+    public PORT: string = '';
+    public MONGO_URL: string = '';
 
     /**
      * Reads the  deployment settings json file at `filePath`. Throws exception if any of the required properties haven't been found
@@ -22,24 +22,26 @@ class MeteorSettings {
      * @throws
      * @returns {MeteorSettings} Returns a MeteorSettings object if the settings file contain all the required keys
      */
-    static parseSettingsFile(filePath: string): MeteorSettings {
+    public static parseSettingsFile(filePath: string): MeteorSettings {
         const settingsObj = this.readSettingsObj(filePath);
         return this.parseSettingsObj(settingsObj);
     }
-    static readSettingsObj(filePath: string): any {
+    protected static readSettingsObj(filePath: string): MeteorSettings {
         if(filePath == '' || !fs.existsSync(filePath)){
             throw `Invalid path to meteor settings file: ${filePath}`;
         }
         Logger.log(`=> Parsing deployment settings at path: ${filePath}`);
         let settingsPath = (path.isAbsolute(filePath))? filePath : path.join(process.cwd(), filePath);
         const json = fs.readFileSync(settingsPath, 'utf8');
-        return JSON.parse(json);
+        let instance = JSON.parse(json);
+        instance.filePath = settingsPath;
+        return instance;
     }
-    static parseSettingsObj(settingsObj: any) {
+    protected static parseSettingsObj(settingsObj: MeteorSettings): MeteorSettings {
         type MeteorSettingsKeys = keyof MeteorSettings;
         const requiredKeys: MeteorSettingsKeys[] = ['name', 'ROOT_URL', 'PORT', 'MONGO_URL'];
         const settings = new MeteorSettings();
-        requiredKeys.forEach((key) => {
+        requiredKeys.forEach((key): void => {
             settings[key] = settingsObj[key];
         });
         settings.validateProperties();
@@ -50,11 +52,11 @@ class MeteorSettings {
      * Makes sure that all required properties have been set and are not empty strings.
      * @throws
      */
-    validateProperties() {
+    public validateProperties(): void {
         type MeteorSettingsKeys = keyof MeteorSettings;
         const requiredKeys: MeteorSettingsKeys[] = ['name', 'ROOT_URL', 'PORT', 'MONGO_URL'];
         let missingKeys: string[] = [];
-        requiredKeys.forEach((key) => {
+        requiredKeys.forEach((key): void => {
             const value = this[key];
             if (value == '') {
                 missingKeys.push(key);

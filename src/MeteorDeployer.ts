@@ -9,9 +9,13 @@ class MeteorDeployer {
     /**
      * @property {string} buildPath Path to where you want the bundle built at
      * @property {MeteorSettings} settings Settings json decoded into a MeteorSettings object
+     * @property {string} bundlePath The path to the built bundle
+     * @property {string} dockerfilePath The path thhe Dockerfile that was created inside the bundle
      */
-    buildPath: string; 
-    settings: MeteorSettings;
+    public buildPath: string; 
+    public settings: MeteorSettings;
+    public bundlePath: string;
+    public dockerfilePath: string;
 
 
     /**
@@ -19,15 +23,40 @@ class MeteorDeployer {
      * @param {MeteorSettings} settings `MeteorSettings` that have been parsed to be used with the build process.
      * @param {string} buildPath Path to where you want the bundle built at
      */
-    constructor(settings: MeteorSettings, buildPath: string) {
+    public constructor(settings: MeteorSettings, buildPath: string) {
         this.settings = settings;
         this.buildPath = buildPath;
+        this.bundlePath = path.join(this.buildPath, this.settings.name, 'bundle');
+        this.dockerfilePath = path.join(this.bundlePath, 'Dockerfile');
+    }
+
+    /**
+     * Builds the bundle, copies settings json, creates a package.json to launch the app and includes a Dockerfile
+     * for building a docker image
+     */
+    public build(): void {
+        this.createBuild();
+        this.copySettings();
+        this.createPackageFile();
+        this.createDockerfile();
+    }
+
+    /**
+     * Calls `docker build` with the Dockerfile in the built bundle directory
+     * @param {string|null} tag Optional tag to be used with the Docker image
+     */
+    public dockerBuild(tag: string | null = null): void {
+        Logger.log('=> Creating Docker image');
+        fs.accessSync(this.buildPath, fs.constants.R_OK);
+        const tagOption = (tag != null)? `--tag ${tag}`: '';
+        const command = `docker build -f ${this.dockerfilePath} ${tagOption} ${this.buildPath}`;
+        execSync(command, {stdio: 'inherit'});
     }
 
     /**
      * Builds the bundle using the values in the settings file.
      */
-    createBuild() {
+    public createBuild(): void {
         Logger.log('=> Creating Bundle');
         fs.accessSync(this.buildPath, fs.constants.W_OK);
         const destination = path.join(this.buildPath, this.settings.name);
@@ -37,7 +66,7 @@ class MeteorDeployer {
     /**
      * Copies the settings file into the bundle root as `settings.json`
      */
-    copySettings() {
+    public copySettings(): void {
         Logger.log('=> Copying settings file');
         fs.accessSync(this.buildPath, fs.constants.W_OK);
         const destination = path.join(this.buildPath, this.settings.name, 'bundle', 'settings.json');
@@ -48,7 +77,7 @@ class MeteorDeployer {
      * Creates the `package.json` file at the root of the bundle for launching the app.
      * @param {string} version Version number to be used in the package.json file
      */
-    createPackageFile(version: string = '1.0.0') {
+    public createPackageFile(version: string = '1.0.0'): void {
         Logger.log('=> Creating package.json');
         
         const packageFile = {
@@ -68,7 +97,7 @@ class MeteorDeployer {
      * Creates a `dockerfile` in the root of the bundle for building an image. The image will contain the bundle
      * within the docker image.
      */
-    createDockerfile() {
+    public createDockerfile(): void {
         //.dockerignore node_modules test files, docker files themselves
         //npm cache clean --force
         //-e "NODE_ENV=production"
@@ -90,7 +119,7 @@ class MeteorDeployer {
         ENV ROOT_URL=${this.settings.ROOT_URL}:${this.settings.PORT}/
         CMD ["npm", "start"]
         EXPOSE ${this.settings.PORT}`;
-        const destination = path.join(this.buildPath, this.settings.name, 'bundle', 'Dockerfile');
+        const destination = this.dockerfilePath;
         fs.writeFileSync(destination, file);
         Logger.log(`\tDockerfile created at ${destination}`);
     }

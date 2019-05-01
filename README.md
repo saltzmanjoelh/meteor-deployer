@@ -4,11 +4,19 @@
 `npm install -g @saltzmanjoelh/meteor-deployer`
 
 ## Usage
-`meteor-deployer --settings file.json [options]`
+`meteor-deployer --settings JSON_FILE_PATH [OPTIONS] [ACTIONS] `
+
+## Example
+`meteor-deployer --settings production.json build`
 
 | Option      | Description                                 |
 | ----------- | ------------------------------------------- |
 | --buildPath | Path to where you want the bundle built at. |
+
+| Action       | Description                                                              |
+| ------------ | ------------------------------------------------------------------------ |
+| build        | Build the Meteor bundle, copy the settings json and create a Dockerfile. |
+| docker-build | Calls `docker build` with the Dockerfile in the built bundle directory.  |
 
 ## Example Settings json file
 ```
@@ -19,3 +27,8 @@
     "MONGO_URL": "mongodb+srv://user:db.example.com/exampleApp"
 }
 ```
+
+## Dockerize
+Building a bundle will also create a `Dockerfile` in the bundle.
+
+`cd $buildPath && docker build .`
