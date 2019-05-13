@@ -4,7 +4,7 @@ import { Logger } from './Logger';
 
 class MeteorSettings {
     /**
-     * @property {string} filePath Location of deployment settings json file. Typically production.json
+     * @property {string} filePath Location of meteor settings json file. Typically production.json
      * @property {string} name The name of your application
      * @property {string} ROOT_URL The url to where you are deploying your application (http://app.example.com)
      * @property {string} PORT The port your app uses to access Meteor. (3000)
@@ -17,8 +17,8 @@ class MeteorSettings {
     public MONGO_URL: string = '';
 
     /**
-     * Reads the  deployment settings json file at `filePath`. Throws exception if any of the required properties haven't been found
-     * @param {string} filePath Location of deployment settings json file. Typically production.json 
+     * Reads the meteor settings json file at `filePath`. Throws exception if any of the required properties haven't been found
+     * @param {string} filePath Location of meteor settings json file. Typically production.json 
      * @throws
      * @returns {MeteorSettings} Returns a MeteorSettings object if the settings file contain all the required keys
      */
@@ -30,7 +30,7 @@ class MeteorSettings {
         if(filePath == '' || !fs.existsSync(filePath)){
             throw `Invalid path to meteor settings file: ${filePath}`;
         }
-        Logger.log(`=> Parsing deployment settings at path: ${filePath}`);
+        Logger.log(`=> Parsing meteor settings at path: ${filePath}`);
         let settingsPath = (path.isAbsolute(filePath))? filePath : path.join(process.cwd(), filePath);
         const json = fs.readFileSync(settingsPath, 'utf8');
         let instance = JSON.parse(json);

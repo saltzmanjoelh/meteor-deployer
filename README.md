@@ -4,21 +4,22 @@
 `npm install -g @saltzmanjoelh/meteor-deployer`
 
 ## Usage
-`meteor-deployer --settings JSON_FILE_PATH [OPTIONS] [ACTIONS] `
+`meteor-deployer TARGET [ACTIONS]`
 
 ## Example
-`meteor-deployer --settings production.json build`
+`meteor-deployer staging`
 
-| Option      | Description                                 |
-| ----------- | ------------------------------------------- |
-| --buildPath | Path to where you want the bundle built at. |
+| TARGET                | Description                                                                                                                                            |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| staging or production | Used to determine which settings and deployment files to use. For example `meteor-deployer staging` will use staging.json and staging.config.json. |
 
-| Action       | Description                                                              |
-| ------------ | ------------------------------------------------------------------------ |
-| build        | Build the Meteor bundle, copy the settings json and create a Dockerfile. |
-| docker-build | Calls `docker build` with the Dockerfile in the built bundle directory.  |
+| Action       | Description                                                                            |
+| ------------ | -------------------------------------------------------------------------------------- |
+| build        | Build the Meteor bundle, copy the settings json and create a Dockerfile in the bundle. |
+| docker-build | Executes `docker build` with the Dockerfile in the built bundle directory.             |
+| tar          | Creates a tarball of the bundle in the build directory.                                |
 
-## Example Settings json file
+## Example Meteor settings json file
 ```
 {
     "name": "Example App",
@@ -28,7 +29,15 @@
 }
 ```
 
-## Dockerize
-Building a bundle will also create a `Dockerfile` in the bundle.
+## Example deployment configuration json file:
+```
+{
+    "buildPath": "/tmp/appBuild",
+    "s3": {
+        "bucket": app.example.com.productionBundles,
+        "credentialsPath": "./path/to/aws_credentials"
+    }
+}
+```
 
-`cd $buildPath && docker build .`
+Thanks: https://blog.mvp-space.com/how-to-dockerize-a-meteor-app-with-just-one-script-4bccb26f6ff0

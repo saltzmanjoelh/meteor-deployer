@@ -9,55 +9,42 @@ afterEach((): void => {
     sinon.restore();
 });
 
-//process.env['npm_lifecycle_event'] == 'test' || (process.env['VSCODE_PID'] != undefined);
-describe('Logger.checkEnvironment()', (): void => {
-    it('should return true with test npm_lifecycle_event and test VSCODE_PID', (): void => {
-        const VSCODE_PID = process.env['VSCODE_PID'];
-        const npmLifecycleEvent = process.env['npm_lifecycle_event'];
-        process.env['VSCODE_PID'] = 'test';
-        process.env['npm_lifecycle_event'] = 'test';        
+describe('Logger.skipLogging()', (): void => {
+    it('should return true with test npm_lifecycle_event and valid VSCODE_PID', (): void => {
 
-        const result = Logger.checkEnvironment();
+        const result = Logger.skipLogging('test', '100');
         
         assert.isTrue(result);
-        process.env['npm_lifecycle_event'] = npmLifecycleEvent;
-        process.env['VSCODE_PID'] = VSCODE_PID;
     });
     it('should return true with test npm_lifecycle_event and undefined VSCODE_PID', (): void => {
-        const VSCODE_PID = process.env['VSCODE_PID'];
-        const npmLifecycleEvent = process.env['npm_lifecycle_event'];
-        process.env['VSCODE_PID'] = 'test';
-        process.env['npm_lifecycle_event'] = 'test';        
 
-        const result = Logger.checkEnvironment();
+        const result = Logger.skipLogging('test', undefined);
         
         assert.isTrue(result);
-        process.env['npm_lifecycle_event'] = npmLifecycleEvent;
-        process.env['VSCODE_PID'] = VSCODE_PID;
     });
-    it('should return true with undefined npm_lifecycle_event and test VSCODE_PID', (): void => {
-        const VSCODE_PID = process.env['VSCODE_PID'];
-        const npmLifecycleEvent = process.env['npm_lifecycle_event'];
-        process.env['VSCODE_PID'] = undefined;
-        process.env['npm_lifecycle_event'] = undefined;
+    it('should return true with undefined npm_lifecycle_event and valid VSCODE_PID', (): void => {
 
-        const result = Logger.checkEnvironment();
+        const result = Logger.skipLogging(undefined, '100');
         
         assert.isTrue(result);
-        process.env['npm_lifecycle_event'] = npmLifecycleEvent;
-        process.env['VSCODE_PID'] = VSCODE_PID;
     });
-    it('should return true with test npm_lifecycle_event and undefined VSCODE_PID', (): void => {
-        const VSCODE_PID = process.env['VSCODE_PID'];
-        const npmLifecycleEvent = process.env['npm_lifecycle_event'];
-        process.env['VSCODE_PID'] = undefined;
-        process.env['npm_lifecycle_event'] = undefined;
+    it('should return true with undefined npm_lifecycle_event and undefined VSCODE_PID', (): void => {
 
-        const result = Logger.checkEnvironment();
+        const result = Logger.skipLogging(undefined, undefined);
+        
+        assert.isFalse(result);
+    });
+    it('should return true with invalid npm_lifecycle_event and valid VSCODE_PID', (): void => {
+
+        const result = Logger.skipLogging('invalid', '100');
         
         assert.isTrue(result);
-        process.env['npm_lifecycle_event'] = npmLifecycleEvent;
-        process.env['VSCODE_PID'] = VSCODE_PID;
+    });
+    it('should return true with invalid npm_lifecycle_event and undefined VSCODE_PID', (): void => {
+
+        const result = Logger.skipLogging('invalid', undefined);
+        
+        assert.isFalse(result);
     });
 });
 
