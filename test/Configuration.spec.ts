@@ -3,7 +3,8 @@ import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 import * as fs from 'fs';
-import * as config from '../src/Configuration';
+import Configuration from '../src/Configuration';
+import ConfigurationInterface from '../src/ConfigurationInterface';
 
 afterEach((): void => {
     // Restore the default sandbox here
@@ -12,9 +13,9 @@ afterEach((): void => {
 
 describe('Configuration.validateJson()', (): void => {
     it('should throw error when buildPath is missing', (): void => {
-        const obj = JSON.parse('{"invalid":true}') as config.ConfigurationInterface;
+        const obj = JSON.parse('{"invalid":true}') as ConfigurationInterface;
         assert.throws((): void => {
-            config.Configuration.validateJson('path', obj);
+            Configuration.validateJson('path', obj);
         });
     });
 });
@@ -22,7 +23,7 @@ describe('Configuration.validateJson()', (): void => {
 describe('Configuration.parseConfigFile()', (): void => {
     it('should throw when filePath is empty', (): void => {
         assert.throws((): void => {
-            config.Configuration.parseConfigFile('');
+            Configuration.parseConfigFile('');
         });
     });
     it('should throw when filePath doesn\'t exist', (): void => {
@@ -30,7 +31,7 @@ describe('Configuration.parseConfigFile()', (): void => {
         sinon.stub(fs, 'existsSync').callsFake(fake);
 
         assert.throws((): void => {
-            config.Configuration.parseConfigFile('/invalid/path');
+            Configuration.parseConfigFile('/invalid/path');
         });
     });
     it('should prefix full path to filename', (): void => {
@@ -38,7 +39,7 @@ describe('Configuration.parseConfigFile()', (): void => {
         const callback = sinon.fake.returns("{\"buildPath\": \"/tmp/appBundle\"}");
         sinon.stub(fs, 'readFileSync').callsFake(callback);
 
-        config.Configuration.parseConfigFile('staging.config.json');
+        Configuration.parseConfigFile('staging.config.json');
 
         const result: string = callback.args[0][0];
         assert.notEqual(result, 'staging.config.json');
@@ -48,7 +49,7 @@ describe('Configuration.parseConfigFile()', (): void => {
         const callback = sinon.fake.returns("{\"buildPath\": \"/tmp/appBundle\"}");
         sinon.stub(fs, 'readFileSync').callsFake(callback);
 
-        config.Configuration.parseConfigFile('/src/staging.config.json');
+        Configuration.parseConfigFile('/src/staging.config.json');
 
         const result: string = callback.args[0][0];
         assert.equal(result, '/src/staging.config.json');
@@ -58,9 +59,9 @@ describe('Configuration.parseConfigFile()', (): void => {
         const callback = sinon.fake.returns("{\"buildPath\": \"/tmp/appBundle\"}");
         sinon.stub(fs, 'readFileSync').callsFake(callback);
 
-        const result = config.Configuration.parseConfigFile('/src/staging.config.json');
+        const result = Configuration.parseConfigFile('/src/staging.config.json');
 
-        assert.instanceOf(result, config.Configuration);
+        assert.instanceOf(result, Configuration);
         
     });
 });

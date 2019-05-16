@@ -2,7 +2,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
-import { Logger } from '../src/Logger';
+import Logger from '../src/Logger';
 
 afterEach((): void => {
     // Restore the default sandbox here

@@ -1,4 +1,4 @@
-class Logger {
+export default class Logger {
 
     /**
      * VSCODE_PID is set when running tests through Test Explorer UI
@@ -28,4 +28,5 @@ class Logger {
         console.log(message);
     }
 }
+
 export { Logger };

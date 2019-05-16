@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-import { MeteorDeployer } from "./MeteorDeployer";
+import MeteorDeployer from "./MeteorDeployer";
+import * as path from 'path';
 
 //Validate input
 const argv = require('minimist')(process.argv.slice(2));
@@ -8,13 +9,16 @@ if(argv.settings == undefined || argv['_'].length == 0){
     if(argv['_'].length == 0){
         console.log(`You didn't specify the TARGET. You should should specify something like \`meteor-deployer staging\` or \`meteor-deployer production\``);
     }
-    console.log('Usage: meteor-deployer TARGET [ACTIONS]\n');
-    console.log('Target: staging or production. Used to determine which settings and deployment files to use. For example `meteor-deployer staging` will use staging.json and staging.config.json.');
+    console.log('Usage: meteor-deployer TARGET [ACTIONS] [OPTIONS]\n');
+    console.log('Target: staging or production. Used to determine which settings and deployment files to use. Any target name can be used. For example `meteor-deployer staging` will use staging.json and staging.config.json.');
     console.log('\n');
     console.log('Actions:         If none are specified, all are performed.');
     console.log('  build:         Build the Meteor bundle, copy the settings json and create a Dockerfile in the bundle.');
     console.log('  docker-build:  Executes `docker build` with the Dockerfile in the built bundle directory');
     console.log('  tar:           Creates a tarball of the bundle in the build directory.');
+    console.log('\n');
+    console.log('Options:');
+    console.log('  --source:      The path to the meteor package to work with. `process.cwd()` will be used by default.');
     console.log('\n');
     console.log('Example Meteor settings json file:');
     console.log(`
@@ -39,7 +43,14 @@ if(argv.settings == undefined || argv['_'].length == 0){
     console.log('Thanks: https://blog.mvp-space.com/how-to-dockerize-a-meteor-app-with-just-one-script-4bccb26f6ff0');
 }
 
-const target = argv._.splice(0, 1);
+let target = argv._.splice(0, 1);
+if(argv.source != undefined){
+    if(path.isAbsolute(target)){
+        console.log('You provided and a path with the target and the --source arg. Pick one, don\'t use both.');
+        process.exit(1);
+    }
+    target = path.join(argv.source, target);
+}
 // const settings = MeteorSettings.parseSettingsFile(argv.settings);
 // const deployer = new MeteorDeployer(target, (argv.buildPath == undefined)? process.cwd() : argv.buildPath);
 const deployer = MeteorDeployer.parseTarget(target);
@@ -51,6 +62,8 @@ if(argv._.length == 1){//Only target was defined, perform all actions
     if(argv._.contains('build')) {
         deployer.build();
     }
-
+    if(argv._.contains('docker-build')) {
+        deployer.dockerBuild(deployer.packageVersion());
+    }
 }
 

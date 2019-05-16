@@ -1,6 +1,6 @@
 'use strict';
 import 'mocha';
-import { MeteorSettings } from '../src/MeteorSettings';
+import MeteorSettings from '../src/MeteorSettings';
 import MeteorSettingsFixture from './MeteorSettingsFixture';
 import { assert } from 'chai';
 import * as sinon from 'sinon';

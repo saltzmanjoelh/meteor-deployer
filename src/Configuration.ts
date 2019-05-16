@@ -1,12 +1,14 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { Logger } from './Logger';
+import Logger from './Logger';
+import ConfigurationInterface from './ConfigurationInterface';
 
-export interface ConfigurationInterface {
-    buildPath: string;
-}
-
-class Configuration implements ConfigurationInterface {
+export default class Configuration implements ConfigurationInterface {
+    /**
+     * @property {string} filePath Location of meteor-deployer configuration json file. Typically production.config.json
+     * @property {string} buildPath Output path to where the package should be built at
+     */
+    public filePath: string = process.cwd();
     public buildPath: string;
 
     /**
@@ -23,7 +25,9 @@ class Configuration implements ConfigurationInterface {
         const json = fs.readFileSync(configPath, 'utf8');
         const obj = JSON.parse(json) as ConfigurationInterface;
         Configuration.validateJson(configPath, obj);
-        return new Configuration(obj);
+        let instance = new Configuration(obj);
+        instance.filePath = configPath;
+        return instance;
     }
 
     public static validateJson(configPath: string, obj: ConfigurationInterface): void {
@@ -36,5 +40,3 @@ class Configuration implements ConfigurationInterface {
         this.buildPath = obj.buildPath;
     }
 }
-
-export { Configuration };

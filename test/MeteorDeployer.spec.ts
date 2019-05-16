@@ -1,8 +1,9 @@
 'use strict';
 import 'mocha';
-import { MeteorDeployer } from '../src/MeteorDeployer';
-import { MeteorSettings } from '../src/MeteorSettings';
-import { Configuration } from '../src/Configuration';
+import NpmPackageInterface from '../src/NpmPackageInterface';
+import MeteorDeployer from '../src/MeteorDeployer';
+import MeteorSettings from '../src/MeteorSettings';
+import Configuration from '../src/Configuration';
 import MeteorSettingsFixture from './MeteorSettingsFixture';
 import ConfigurationFixture from './ConfigurationFixture';
 import { assert } from 'chai';
@@ -29,6 +30,35 @@ describe('MeteorDeployer.parseTarget()', (): void => {
         assert.throws((): void => {
             MeteorDeployer.parseTarget('invalid');
         });
+    });
+});
+describe('MeteorDeployer.parsePackageVersion()', (): void => {
+    it('should return default value for undefined version number', (): void => {
+        const deployer = new MeteorDeployer(MeteorSettingsFixture, ConfigurationFixture);
+        sinon.stub(deployer, 'readNpmPackageFile').callsFake((): NpmPackageInterface => { return {version: '1'}; });
+
+        assert.throws((): void => {
+            deployer.parsePackageVersion();
+        });
+    });
+});
+describe('MeteorDeployer.readNpmPackageFile()', (): void => {
+    it('should throw with an invalid directory name from the MeteorSettings filePath', (): void => {
+        sinon.stub(fs, 'existsSync').callsFake((): boolean => { return false; });
+        const deployer = new MeteorDeployer(MeteorSettingsFixture, ConfigurationFixture);
+
+        assert.throws((): void => {
+            deployer.parsePackageVersion();
+        });
+    });
+    it('should return NpmPackageInterface instance', (): void => {
+        sinon.stub(fs, 'existsSync').callsFake((): boolean => { return true; });
+        sinon.stub(fs, 'readFileSync').callsFake((): string => { return '{"version": "9.9.9"}'; });
+        const deployer = new MeteorDeployer(MeteorSettingsFixture, ConfigurationFixture);
+
+        const result = deployer.readNpmPackageFile();
+
+        assert.isNotNull(result);
     });
 });
 describe('MeteorDeployer constructor', (): void => {

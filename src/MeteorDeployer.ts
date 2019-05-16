@@ -1,11 +1,12 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import { execSync } from 'child_process';
-import { Configuration } from './Configuration';
-import { MeteorSettings } from './MeteorSettings';
-import { Logger } from './Logger';
+import Configuration from './Configuration';
+import MeteorSettings from './MeteorSettings';
+import Logger from './Logger';
+import NpmPackageInterface from './NpmPackageInterface';
 
-class MeteorDeployer {
+export default class MeteorDeployer {
 
     /**
      * Looks for `${target}.json` and `${target}.deployment.json` files to parse.
@@ -46,15 +47,37 @@ class MeteorDeployer {
         this.bundlePath = path.join(this.config.buildPath, this.meteorSettings.name, 'bundle');
         this.dockerfilePath = path.join(this.bundlePath, 'Dockerfile');
     }
-
+    
     public packageVersion(): string {
         if(this._packageVersion == '0.0.0'){
             this._packageVersion = this.parsePackageVersion();
         }
         return this._packageVersion;
     }
+    /**
+     * Reads the package.json file at settings path to determine package version number.
+     */
     public parsePackageVersion(): string {
-        return '1.0.0';
+        const npmPackage = this.readNpmPackageFile();
+        const version = npmPackage.version as string;
+        if(version == undefined || version.split('.').length != 3){
+            throw `Unexpected package version: ${version}`;
+        }
+        return version
+    }
+    /**
+     * Reads the package.json file at settings path and returns an NpmPackageInterface
+     * @returns {NpmPackageInterface}
+     */
+    public readNpmPackageFile(): NpmPackageInterface {
+        const directory = path.dirname(this.meteorSettings.filePath);
+        const filePath = path.join(directory, 'package.json');
+        if(filePath == '' || !fs.existsSync(filePath)){
+            throw `Invalid path to package.json: ${filePath}`;
+        }
+        Logger.log(`=> Parsing package.json at path: ${filePath}`);
+        const json = fs.readFileSync(filePath, 'utf8');
+        return JSON.parse(json) as NpmPackageInterface;
     }
 
     /**

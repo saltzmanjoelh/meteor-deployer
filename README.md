@@ -4,20 +4,24 @@
 `npm install -g @saltzmanjoelh/meteor-deployer`
 
 ## Usage
-`meteor-deployer TARGET [ACTIONS]`
+`meteor-deployer TARGET [ACTIONS] [OPTIONS]`
 
 ## Example
 `meteor-deployer staging`
 
 | TARGET                | Description                                                                                                                                            |
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| staging or production | Used to determine which settings and deployment files to use. For example `meteor-deployer staging` will use staging.json and staging.config.json. |
+| staging or production | Used to determine which settings and deployment files to use. Any target name can be used. For example `meteor-deployer staging` will use staging.json and staging.config.json. |
 
 | Action       | Description                                                                            |
 | ------------ | -------------------------------------------------------------------------------------- |
 | build        | Build the Meteor bundle, copy the settings json and create a Dockerfile in the bundle. |
 | docker-build | Executes `docker build` with the Dockerfile in the built bundle directory.             |
 | tar          | Creates a tarball of the bundle in the build directory.                                |
+
+| Option   | Description                                                                           |
+| -------- | --------------------------------------------------------------------------------------|
+| --source | The path to the meteor package to work with. `process.cwd()` will be used by default. |
 
 ## Example Meteor settings json file
 ```

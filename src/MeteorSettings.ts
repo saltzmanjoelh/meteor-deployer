@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { Logger } from './Logger';
+import Logger from './Logger';
 
-class MeteorSettings {
+export default class MeteorSettings {
     /**
      * @property {string} filePath Location of meteor settings json file. Typically production.json
      * @property {string} name The name of your application
