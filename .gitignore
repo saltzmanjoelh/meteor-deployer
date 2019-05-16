@@ -4,3 +4,4 @@ coverage
 dist
 dist/*
 node_modules
+dist/test/MeteorSettings.spec.js
