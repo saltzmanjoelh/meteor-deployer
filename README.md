@@ -38,7 +38,7 @@
 {
     "buildPath": "/tmp/appBuild",
     "s3": {
-        "bucket": app.example.com.productionBundles,
+        "bucket": "app-example-com/productionBundles",
         "credentialsPath": "./path/to/aws_credentials"
     }
 }

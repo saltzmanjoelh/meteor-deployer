@@ -35,7 +35,7 @@ if(argv.settings == undefined || argv['_'].length == 0){
     {
         "buildPath": "/tmp/appBuild",
         "s3": {
-            "bucket": app.example.com.productionBundles,
+            "bucket": "app-example-com/productionBundles",
             "credentialsPath": "./path/to/aws_credentials"
         }
     }
@@ -51,8 +51,10 @@ if(argv.source != undefined){
     }
     target = path.join(argv.source, target);
 }
-// const settings = MeteorSettings.parseSettingsFile(argv.settings);
-// const deployer = new MeteorDeployer(target, (argv.buildPath == undefined)? process.cwd() : argv.buildPath);
+if(argv._.length == 0){
+    process.exit(1);
+}
+
 const deployer = MeteorDeployer.parseTarget(target);
 if(argv._.length == 1){//Only target was defined, perform all actions
     deployer.build();
