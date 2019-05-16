@@ -1,6 +1,5 @@
 .nyc_output
 .vscode
-vscode/*
 vscode/
 coverage
 node_modules
