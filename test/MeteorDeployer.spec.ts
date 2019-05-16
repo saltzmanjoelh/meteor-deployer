@@ -106,7 +106,6 @@ describe('MeteorDeployer.build()', (): void => {
         const createPackageFile = sinon.stub(deployer, 'createPackageFile').callsFake((): void => {  });
         const createDockerfile = sinon.stub(deployer, 'createDockerfile').callsFake((): void => {  });
         
-        
         deployer.build();
 
         assert.isTrue(createBuild.calledOnce);
@@ -118,7 +117,7 @@ describe('MeteorDeployer.build()', (): void => {
 
 describe('MeteorDeployer.dockerBuild()', (): void => {
     it('should execute docker build command', (): void => {
-        sinon.stub(fs, 'accessSync').callsFake((): void => {  });//accessSync passes with fixture path
+        sinon.stub(fs, 'accessSync').callsFake((): void => {  });
         const callback = sinon.fake();
         sinon.stub(childProcess, 'execSync').callsFake(callback);
         const deployer = new MeteorDeployer(MeteorSettingsFixture, ConfigurationFixture);
@@ -132,7 +131,7 @@ describe('MeteorDeployer.dockerBuild()', (): void => {
         assert.include(command, deployer.config.buildPath);
     });
     it('should apply tag version', (): void => {
-        sinon.stub(fs, 'accessSync').callsFake((): void => {  });//accessSync passes with fixture path
+        sinon.stub(fs, 'accessSync').callsFake((): void => {  });
         const callback = sinon.fake();
         sinon.stub(childProcess, 'execSync').callsFake(callback);
         const deployer = new MeteorDeployer(MeteorSettingsFixture, ConfigurationFixture);
@@ -147,7 +146,8 @@ describe('MeteorDeployer.dockerBuild()', (): void => {
 
 describe('MeteorDeployer.createBuild()', (): void => {
     it('should execute build command', (): void => {
-        sinon.stub(fs, 'accessSync').callsFake((): void => {  });//accessSync passes with fixture path
+        sinon.stub(fs, 'existsSync').returns(true);
+        sinon.stub(fs, 'accessSync').returns();
         const callback = sinon.fake();
         sinon.stub(childProcess, 'execSync').callsFake(callback);
         const deployer = new MeteorDeployer(MeteorSettingsFixture, ConfigurationFixture);
@@ -162,11 +162,26 @@ describe('MeteorDeployer.createBuild()', (): void => {
         assert.include(command, deployer.meteorSettings.PORT);
         assert.equal(command, `meteor build --allow-superuser --directory /some/path/${MeteorSettingsFixture.name} --server ${MeteorSettingsFixture.ROOT_URL}:${MeteorSettingsFixture.PORT}`)
     });
+
+    it('should create build directory', (): void => {
+        sinon.stub(fs, 'existsSync').returns(false);
+        const callback = sinon.fake();
+        sinon.stub(fs, 'mkdirSync').callsFake(callback);
+        sinon.stub(fs, 'accessSync').returns();
+        sinon.stub(childProcess, 'execSync').callsFake(sinon.fake());
+        const deployer = new MeteorDeployer(MeteorSettingsFixture, ConfigurationFixture);
+        
+        deployer.createBuild();
+
+        assert.isTrue(callback.calledOnce);
+        const directory: string = callback.args[0][0];
+        assert.equal(directory, deployer.config.buildPath);
+    });
 });
 
 describe('MeteorDeployer.copySettings()', (): void => {
     it('should perform copyFileSync command', (): void => {
-        sinon.stub(fs, 'accessSync').callsFake((): void => { });//accessSync passes with fixture path
+        sinon.stub(fs, 'accessSync').callsFake((): void => { });
         const callback = sinon.fake();
         sinon.stub(fs, 'copyFileSync').callsFake(callback);
         const deployer = new MeteorDeployer(MeteorSettingsFixture, ConfigurationFixture);

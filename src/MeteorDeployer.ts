@@ -108,6 +108,9 @@ export default class MeteorDeployer {
      */
     public createBuild(): void {
         Logger.log('=> Creating Bundle');
+        if(!fs.existsSync(this.config.buildPath)){
+            fs.mkdirSync(this.config.buildPath);
+        }
         fs.accessSync(this.config.buildPath, fs.constants.W_OK);
         const destination = path.join(this.config.buildPath, this.meteorSettings.name);
         const command = `meteor build --allow-superuser --directory ${destination} --server ${this.meteorSettings.ROOT_URL}:${this.meteorSettings.PORT}`;

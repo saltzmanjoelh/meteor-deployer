@@ -56,15 +56,15 @@ if(argv._.length == 0){
 }
 
 const deployer = MeteorDeployer.parseTarget(target);
-if(argv._.length == 1){//Only target was defined, perform all actions
+if(argv._.length == 0){//Only target was defined and has been removed
     deployer.build();
     deployer.dockerBuild(deployer.packageVersion());
     deployer.tarBundle(deployer.bundlePath, deployer.config.buildPath, deployer.packageVersion());
 } else {//actions were specified
-    if(argv._.contains('build')) {
+    if(argv._.includes('build')) {
         deployer.build();
     }
-    if(argv._.contains('docker-build')) {
+    if(argv._.includes('docker-build')) {
         deployer.dockerBuild(deployer.packageVersion());
     }
 }
