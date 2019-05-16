@@ -5,7 +5,7 @@ import * as path from 'path';
 
 //Validate input
 const argv = require('minimist')(process.argv.slice(2));
-if(argv.settings == undefined || argv['_'].length == 0){
+if(argv._.length == 0 || argv._.includes('help')){
     if(argv['_'].length == 0){
         console.log(`You didn't specify the TARGET. You should should specify something like \`meteor-deployer staging\` or \`meteor-deployer production\``);
     }
