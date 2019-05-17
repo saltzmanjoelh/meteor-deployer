@@ -57,10 +57,12 @@ if(argv._.length == 0){
 
 const deployer = MeteorDeployer.parseTarget(target);
 if(argv._.length == 0){//Only target was defined and has been removed
+    console.log(`Deploy to ${target}`);
     deployer.build();
     deployer.dockerBuild(deployer.packageVersion());
     deployer.tarBundle(deployer.bundlePath, deployer.config.buildPath, deployer.packageVersion());
 } else {//actions were specified
+    console.log('Actions => ' + argv._.join(', '));
     if(argv._.includes('build')) {
         deployer.build();
     }

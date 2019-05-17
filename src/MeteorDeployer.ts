@@ -85,6 +85,7 @@ export default class MeteorDeployer {
      * for building a docker image
      */
     public build(): void {
+        Logger.log('=> Building')
         this.createBuild();
         this.copySettings();
         this.createPackageFile(this.packageVersion());
