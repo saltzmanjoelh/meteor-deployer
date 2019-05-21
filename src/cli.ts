@@ -41,19 +41,18 @@ if(argv._.length == 0 || argv._.includes('help')){
     }
     `);
     console.log('Thanks: https://blog.mvp-space.com/how-to-dockerize-a-meteor-app-with-just-one-script-4bccb26f6ff0');
+    process.exit(1);
 }
 
 let target = argv._.splice(0, 1);
 if(argv.source != undefined){
     if(path.isAbsolute(target)){
-        console.log('You provided and a path with the target and the --source arg. Pick one, don\'t use both.');
+        console.log('You provided a path with the target and the --source arg. Pick one, don\'t use both.');
         process.exit(1);
     }
     target = path.join(argv.source, target);
 }
-if(argv._.length == 0){
-    process.exit(1);
-}
+
 
 const deployer = MeteorDeployer.parseTarget(target);
 if(argv._.length == 0){//Only target was defined and has been removed

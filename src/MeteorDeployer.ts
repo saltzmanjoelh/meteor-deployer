@@ -60,7 +60,9 @@ export default class MeteorDeployer {
     public parsePackageVersion(): string {
         const npmPackage = this.readNpmPackageFile();
         const version = npmPackage.version as string;
-        if(version == undefined || version.split('.').length != 3){
+        if(version == undefined ){
+            throw `Version wasn't set in package.json`;
+        } else if(version.split('.').length != 3){
             throw `Unexpected package version: ${version}`;
         }
         return version
@@ -114,7 +116,11 @@ export default class MeteorDeployer {
         }
         fs.accessSync(this.config.buildPath, fs.constants.W_OK);
         const destination = path.join(this.config.buildPath, this.meteorSettings.name);
-        const command = `meteor build --allow-superuser --directory ${destination} --server ${this.meteorSettings.ROOT_URL}:${this.meteorSettings.PORT}`;
+        let command = `meteor build --allow-superuser --directory "${destination}" --server ${this.meteorSettings.ROOT_URL}:${this.meteorSettings.PORT}`;
+        if(process.cwd() != path.dirname(this.config.filePath)){
+            command = `cd ${path.dirname(this.config.filePath)} && ${command}`;
+        }
+        Logger.log(`Executing: ${command}`);
         execSync(command, {stdio: 'inherit'});
     }
     /**

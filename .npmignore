@@ -1,3 +1,9 @@
-coverage/
 .vscode/
 .nyc_output/
+.travis.yml
+.mocharc.js
+.eslintrc.js
+tsconfig.json
+src/
+test/
+coverage/

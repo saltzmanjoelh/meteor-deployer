@@ -33,13 +33,13 @@ export default class MeteorSettings {
         Logger.log(`=> Parsing meteor settings at path: ${filePath}`);
         let settingsPath = (path.isAbsolute(filePath))? filePath : path.join(process.cwd(), filePath);
         const json = fs.readFileSync(settingsPath, 'utf8');
-        let instance = JSON.parse(json);
+        let instance = JSON.parse(json) as MeteorSettings;
         instance.filePath = settingsPath;
         return instance;
     }
     protected static parseSettingsObj(settingsObj: MeteorSettings): MeteorSettings {
         type MeteorSettingsKeys = keyof MeteorSettings;
-        const requiredKeys: MeteorSettingsKeys[] = ['name', 'ROOT_URL', 'PORT', 'MONGO_URL'];
+        const requiredKeys: MeteorSettingsKeys[] = ['name', 'ROOT_URL', 'PORT', 'MONGO_URL', 'filePath'];
         const settings = new MeteorSettings();
         requiredKeys.forEach((key): void => {
             settings[key] = settingsObj[key];

@@ -10,6 +10,7 @@ import { assert } from 'chai';
 import * as sinon from 'sinon';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
+import * as path from 'path';
 
 
 afterEach((): void => {
@@ -34,6 +35,14 @@ describe('MeteorDeployer.parseTarget()', (): void => {
 });
 describe('MeteorDeployer.parsePackageVersion()', (): void => {
     it('should return default value for undefined version number', (): void => {
+        const deployer = new MeteorDeployer(MeteorSettingsFixture, ConfigurationFixture);
+        sinon.stub(deployer, 'readNpmPackageFile').returns(JSON.parse('[]') as NpmPackageInterface);
+
+        assert.throws((): void => {
+            deployer.parsePackageVersion();
+        });
+    });
+    it('should return default value for invalid version number', (): void => {
         const deployer = new MeteorDeployer(MeteorSettingsFixture, ConfigurationFixture);
         sinon.stub(deployer, 'readNpmPackageFile').callsFake((): NpmPackageInterface => { return {version: '1'}; });
 
@@ -160,7 +169,7 @@ describe('MeteorDeployer.createBuild()', (): void => {
         assert.include(command, deployer.meteorSettings.name);
         assert.include(command, deployer.meteorSettings.ROOT_URL);
         assert.include(command, deployer.meteorSettings.PORT);
-        assert.equal(command, `meteor build --allow-superuser --directory /some/path/${MeteorSettingsFixture.name} --server ${MeteorSettingsFixture.ROOT_URL}:${MeteorSettingsFixture.PORT}`)
+        assert.include(command, `meteor build --allow-superuser --directory "/some/path/${MeteorSettingsFixture.name}" --server ${MeteorSettingsFixture.ROOT_URL}:${MeteorSettingsFixture.PORT}`)
     });
 
     it('should create build directory', (): void => {
@@ -176,6 +185,38 @@ describe('MeteorDeployer.createBuild()', (): void => {
         assert.isTrue(callback.calledOnce);
         const directory: string = callback.args[0][0];
         assert.equal(directory, deployer.config.buildPath);
+    });
+
+    it('should cd to project directory', (): void => {
+        sinon.stub(fs, 'existsSync').returns(false);
+        sinon.stub(fs, 'mkdirSync').callsFake(sinon.fake());
+        sinon.stub(fs, 'accessSync').callsFake(sinon.fake());
+        sinon.stub(process, 'cwd').returns('');
+        const execSyncFake = sinon.fake();
+        sinon.stub(childProcess, 'execSync').callsFake(execSyncFake);
+        const deployer = new MeteorDeployer(MeteorSettingsFixture, ConfigurationFixture);
+        
+        deployer.createBuild();
+
+        assert.isTrue(execSyncFake.calledOnce);
+        const command: string = execSyncFake.args[0][0];
+        assert.include(command, `cd ${path.dirname(deployer.config.filePath)}`);
+    });
+
+    it('should not cd to project directory', (): void => {
+        sinon.stub(fs, 'existsSync').returns(false);
+        sinon.stub(fs, 'mkdirSync').callsFake(sinon.fake());
+        sinon.stub(fs, 'accessSync').callsFake(sinon.fake());
+        sinon.stub(process, 'cwd').returns(path.dirname(ConfigurationFixture.filePath));
+        const execSyncFake = sinon.fake();
+        sinon.stub(childProcess, 'execSync').callsFake(execSyncFake);
+        const deployer = new MeteorDeployer(MeteorSettingsFixture, ConfigurationFixture);
+        
+        deployer.createBuild();
+
+        assert.isTrue(execSyncFake.calledOnce);
+        const command: string = execSyncFake.args[0][0];
+        assert.notInclude(command, `cd ${path.dirname(deployer.config.filePath)}`);
     });
 });
 
