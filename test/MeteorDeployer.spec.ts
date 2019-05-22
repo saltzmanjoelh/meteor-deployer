@@ -77,6 +77,9 @@ describe('MeteorDeployer constructor', (): void => {
         
         assert.equal(deployer.config.buildPath, ConfigurationFixture.buildPath);
         assert.equal(deployer.meteorSettings, MeteorSettingsFixture);
+        assert.equal(deployer.appName, "exampleapp");
+        assert.equal(deployer.bundlePath, "/some/path/exampleapp/bundle");
+        assert.equal(deployer.dockerfilePath, "/some/path/exampleapp/bundle/Dockerfile");
     });
 });
 
@@ -135,9 +138,7 @@ describe('MeteorDeployer.dockerBuild()', (): void => {
 
         assert.isTrue(callback.calledOnce);
         const command: string = callback.args[0][0];
-        assert.include(command, 'docker build -f');
-        assert.include(command, deployer.dockerfilePath);
-        assert.include(command, deployer.config.buildPath);
+        assert.include(command, `docker build . --tag ${deployer.appName}:1.0.0`);
     });
     it('should apply tag version', (): void => {
         sinon.stub(fs, 'accessSync').callsFake((): void => {  });
@@ -150,6 +151,34 @@ describe('MeteorDeployer.dockerBuild()', (): void => {
 
         const command: string = callback.args[0][0];
         assert.include(command, tagVersion);
+    });
+
+    it('should cd to bundle directory', (): void => {
+        sinon.stub(fs, 'accessSync').callsFake(sinon.fake());
+        sinon.stub(process, 'cwd').returns('');
+        const execSyncFake = sinon.fake();
+        sinon.stub(childProcess, 'execSync').callsFake(execSyncFake);
+        const deployer = new MeteorDeployer(MeteorSettingsFixture, ConfigurationFixture);
+        
+        deployer.dockerBuild('1.0.0');
+
+        assert.isTrue(execSyncFake.calledOnce);
+        const command: string = execSyncFake.args[0][0];
+        assert.include(command, `cd "${deployer.bundlePath}"`);
+    });
+
+    it('should not cd to bundle directory', (): void => {
+        const deployer = new MeteorDeployer(MeteorSettingsFixture, ConfigurationFixture);
+        sinon.stub(fs, 'accessSync').callsFake(sinon.fake());
+        sinon.stub(process, 'cwd').returns(deployer.bundlePath);
+        const execSyncFake = sinon.fake();
+        sinon.stub(childProcess, 'execSync').callsFake(execSyncFake);
+        
+        deployer.dockerBuild('1.0.0');
+
+        assert.isTrue(execSyncFake.calledOnce);
+        const command: string = execSyncFake.args[0][0];
+        assert.notInclude(command, `cd "${deployer.bundlePath}"`);
     });
 });
 
@@ -166,10 +195,10 @@ describe('MeteorDeployer.createBuild()', (): void => {
         assert.isTrue(callback.calledOnce);
         const command: string = callback.args[0][0];
         assert.include(command, deployer.config.buildPath);
-        assert.include(command, deployer.meteorSettings.name);
+        assert.include(command, deployer.appName);
         assert.include(command, deployer.meteorSettings.ROOT_URL);
         assert.include(command, deployer.meteorSettings.PORT);
-        assert.include(command, `meteor build --allow-superuser --directory "/some/path/${MeteorSettingsFixture.name}" --server ${MeteorSettingsFixture.ROOT_URL}:${MeteorSettingsFixture.PORT}`)
+        assert.include(command, `meteor build --allow-superuser --directory "/some/path/${deployer.appName}" --server ${MeteorSettingsFixture.ROOT_URL}:${MeteorSettingsFixture.PORT}`)
     });
 
     it('should create build directory', (): void => {
@@ -200,7 +229,7 @@ describe('MeteorDeployer.createBuild()', (): void => {
 
         assert.isTrue(execSyncFake.calledOnce);
         const command: string = execSyncFake.args[0][0];
-        assert.include(command, `cd ${path.dirname(deployer.config.filePath)}`);
+        assert.include(command, `cd "${path.dirname(deployer.config.filePath)}"`);
     });
 
     it('should not cd to project directory', (): void => {
@@ -216,7 +245,7 @@ describe('MeteorDeployer.createBuild()', (): void => {
 
         assert.isTrue(execSyncFake.calledOnce);
         const command: string = execSyncFake.args[0][0];
-        assert.notInclude(command, `cd ${path.dirname(deployer.config.filePath)}`);
+        assert.notInclude(command, `cd "${path.dirname(deployer.config.filePath)}"`);
     });
 });
 
@@ -234,7 +263,7 @@ describe('MeteorDeployer.copySettings()', (): void => {
         assert.isTrue(source.includes(deployer.meteorSettings.filePath));
         const destination: string = callback.args[0][1];
         assert.isTrue(destination.includes(deployer.config.buildPath));
-        assert.isTrue(destination.includes(deployer.meteorSettings.name));
+        assert.isTrue(destination.includes(deployer.appName));
         assert.isTrue(destination.includes('bundle'));
         assert.isTrue(destination.includes('settings.json'));
     });
@@ -341,7 +370,7 @@ describe('MeteorDeployer.tarBundle()', (): void => {
 
         assert.isTrue(callback.calledOnce);
         const command: string = callback.args[0][0];
-        assert.include(command, `-C ${deployer.bundlePath}`);
+        assert.include(command, `-C "${deployer.bundlePath}"`);
     });
     it('should create tar with app name', (): void => {
         sinon.stub(fs, 'accessSync').callsFake(sinon.fake());
@@ -351,7 +380,7 @@ describe('MeteorDeployer.tarBundle()', (): void => {
         
         deployer.tarBundle(deployer.bundlePath, deployer.config.buildPath, '1.0.0');
         const command: string = callback.args[0][0];
-        assert.include(command, `-czf /some/path/${deployer.meteorSettings.name}/${deployer.meteorSettings.name}_1.0.0.tar`);
+        assert.include(command, `-czf "/some/path/${deployer.appName}/${deployer.appName}_1.0.0.tar"`);
     });
     it('should append verison number to tar', (): void => {
         sinon.stub(fs, 'accessSync').callsFake(sinon.fake());
@@ -364,6 +393,6 @@ describe('MeteorDeployer.tarBundle()', (): void => {
 
         assert.isTrue(callback.calledOnce);
         const command: string = callback.args[0][0];
-        assert.include(command, `${deployer.meteorSettings.name}_${version}.tar`);
+        assert.include(command, `${deployer.appName}_${version}.tar`);
     });
 });

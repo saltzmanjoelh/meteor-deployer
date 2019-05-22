@@ -10,37 +10,37 @@ afterEach((): void => {
 });
 
 describe('Logger.skipLogging()', (): void => {
-    it('should return true with test npm_lifecycle_event and valid VSCODE_PID', (): void => {
+    it('should return true with test npm_lifecycle_event and valid mochaTest', (): void => {
 
-        const result = Logger.skipLogging('test', '100');
+        const result = Logger.skipLogging('test', '1');
         
         assert.isTrue(result);
     });
-    it('should return true with test npm_lifecycle_event and undefined VSCODE_PID', (): void => {
+    it('should return true with test npm_lifecycle_event and undefined mochaTest', (): void => {
 
         const result = Logger.skipLogging('test', undefined);
         
         assert.isTrue(result);
     });
-    it('should return true with undefined npm_lifecycle_event and valid VSCODE_PID', (): void => {
+    it('should return true with undefined npm_lifecycle_event and valid mochaTest', (): void => {
 
-        const result = Logger.skipLogging(undefined, '100');
+        const result = Logger.skipLogging(undefined, '1');
         
         assert.isTrue(result);
     });
-    it('should return true with undefined npm_lifecycle_event and undefined VSCODE_PID', (): void => {
+    it('should return true with undefined npm_lifecycle_event and undefined mochaTest', (): void => {
 
         const result = Logger.skipLogging(undefined, undefined);
         
         assert.isFalse(result);
     });
-    it('should return true with invalid npm_lifecycle_event and valid VSCODE_PID', (): void => {
+    it('should return true with invalid npm_lifecycle_event and valid mochaTest', (): void => {
 
-        const result = Logger.skipLogging('invalid', '100');
+        const result = Logger.skipLogging('invalid', '1');
         
         assert.isTrue(result);
     });
-    it('should return true with invalid npm_lifecycle_event and undefined VSCODE_PID', (): void => {
+    it('should return true with invalid npm_lifecycle_event and undefined mochaTest', (): void => {
 
         const result = Logger.skipLogging('invalid', undefined);
         
