@@ -8,7 +8,7 @@ export default class MeteorSettings {
      * @property {string} name The name of your application
      * @property {string} ROOT_URL The url to where you are deploying your application (http://app.example.com)
      * @property {string} PORT The port your app uses to access Meteor. (3000)
-     * @property {string} MONGO_URL The url that the app uses to access Mongo DB (mongodb+srv://user:password@cluster1.mongodb.net)
+     * @property {string} MONGO_URL The url that the app uses to access Mongo DB (mongodb://mongo.example.com:27017/admin)
      */
     public filePath: string = '';
     public name: string = '';
@@ -65,6 +65,23 @@ export default class MeteorSettings {
         if (missingKeys.length > 0) {
             throw `Settings json file must include ${requiredKeys.join(', ')}\nDidn't find ${missingKeys.join(', ')}.`;
         }
+    }
+
+    /**
+     * Environment variables used when starting the meteor server
+     */
+    public envString(): string {
+        type MeteorSettingsKeys = keyof MeteorSettings;
+        //TODO: Dynamically get the properties that have values?
+        const requiredKeys: MeteorSettingsKeys[] = ['name', 'ROOT_URL', 'PORT', 'MONGO_URL'];
+        let result = '';
+        requiredKeys.forEach((key): void => {
+            const value = this[key];
+            if (value != '') {
+                result += `${key}="${value}" `;
+            }
+        });
+        return result
     }
     
 }

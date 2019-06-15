@@ -26,7 +26,7 @@ if(argv._.length == 0 || argv._.includes('help')){
         "name": "Example App",
         "ROOT_URL": "https://app.example.com",
         "PORT": 3000,
-        "MONGO_URL": "mongodb+srv://user:db.example.com/exampleApp"
+        "MONGO_URL": "mongodb://mongo.example.com:27017/admin"
         
     }
     `);

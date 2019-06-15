@@ -198,7 +198,7 @@ describe('MeteorDeployer.createBuild()', (): void => {
         assert.include(command, deployer.appName);
         assert.include(command, deployer.meteorSettings.ROOT_URL);
         assert.include(command, deployer.meteorSettings.PORT);
-        assert.include(command, `meteor build --allow-superuser --directory "/some/path/${deployer.appName}" --server ${MeteorSettingsFixture.ROOT_URL}:${MeteorSettingsFixture.PORT}`)
+        assert.include(command, `meteor build --allow-superuser --architecture=os.linux.x86_64 --server-only --directory "/some/path/${deployer.appName}" --server ${MeteorSettingsFixture.ROOT_URL}:${MeteorSettingsFixture.PORT}`)
     });
 
     it('should create build directory', (): void => {

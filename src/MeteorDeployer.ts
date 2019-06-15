@@ -108,7 +108,7 @@ export default class MeteorDeployer {
         }
         fs.accessSync(this.config.buildPath, fs.constants.W_OK);
         const destination = path.join(this.config.buildPath, this.appName);
-        let command = `meteor build --allow-superuser --directory "${destination}" --server ${this.meteorSettings.ROOT_URL}:${this.meteorSettings.PORT}`;
+        let command = `meteor build --allow-superuser --architecture=os.linux.x86_64 --server-only --directory "${destination}" --server ${this.meteorSettings.ROOT_URL}:${this.meteorSettings.PORT}`;
         if(process.cwd() != path.dirname(this.config.filePath)){
             command = `cd "${path.dirname(this.config.filePath)}" && ${command}`;
         }
@@ -138,7 +138,7 @@ export default class MeteorDeployer {
             'name': 'app',
             'version': version,
             'scripts': {
-                'start': 'METEOR_SETTINGS=$(cat settings.json) node main.js'
+                'start': 'METEOR_SETTINGS=\"$(cat settings.json)\" node main.js'
             }
         };
         const file = JSON.stringify(packageFile, null, ' ');
@@ -158,7 +158,7 @@ export default class MeteorDeployer {
         //-u "node"
         Logger.log('=> Creating Dockerfile');
         let file = `
-        FROM node:12-alpine
+        FROM saltzmanjoelh/meteor-alpine:latest
         ENV NODE_ENV production
 
         # Install build tools to compile native npm modules
