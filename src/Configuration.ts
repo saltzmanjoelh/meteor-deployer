@@ -20,7 +20,7 @@ export default class Configuration implements ConfigurationInterface {
         if(filePath == '' || !fs.existsSync(filePath)){
             throw `Invalid config file: ${filePath}`;
         }
-        Logger.log(`=> Parsing meteor config at path: ${filePath}`);
+        Logger.log(`=> Parsing deployment config at path: ${filePath}`);
         let configPath = (path.isAbsolute(filePath))? filePath : path.join(process.cwd(), filePath);
         const json = fs.readFileSync(configPath, 'utf8');
         const obj = JSON.parse(json) as ConfigurationInterface;

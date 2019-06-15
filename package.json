@@ -1,15 +1,15 @@
 {
   "name": "@saltzmanjoelh/meteor-deployer",
-  "version": "1.0.12",
+  "version": "1.0.14",
   "description": "Build a meteor.js bundle and optionally package it into a docker image.",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "test": "nyc mocha"
   },
   "bin": {
-    "meteor-deployer": "dist/src/cli.js"
+    "meteor-deployer": "dist/cli.js"
   },
   "nyc": {
     "include": [
@@ -49,21 +49,21 @@
     "@types/mock-fs": "^3.6.30",
     "@types/node": "^11.13.10",
     "@types/sinon": "^7.0.11",
+    "@typescript-eslint/eslint-plugin": "^1.10.2",
+    "@typescript-eslint/parser": "^1.10.2",
     "chai": "^4.2.0",
     "coveralls": "^3.0.3",
     "eslint": "^5.16.0",
     "istanbul": "^0.4.5",
     "mocha": "^6.1.4",
     "nyc": "^14.1.0",
+    "sinon": "^7.3.2",
     "source-map-support": "^0.5.12",
     "ts-node": "^8.1.0",
     "typescript": "^3.4.5"
   },
   "dependencies": {
     "@types/minimist": "^1.2.0",
-    "@typescript-eslint/eslint-plugin": "^1.7.0",
-    "@typescript-eslint/parser": "^1.7.0",
-    "minimist": "^1.2.0",
-    "sinon": "^7.3.2"
+    "minimist": "^1.2.0"
   }
 }
