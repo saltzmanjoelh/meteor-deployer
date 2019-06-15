@@ -10,6 +10,7 @@
     "exclude": [
       "coverage",
       "node_modules",
-      "dist"
+      "dist",
+      "test"
     ]
   }
