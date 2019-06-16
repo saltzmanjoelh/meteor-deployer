@@ -70,6 +70,7 @@ export default class MeteorSettings {
     /**
      * Environment variables used when starting the meteor server
      */
+    //???: Useful if you want a json string for env but why not use the settings.json file instead?
     public envString(): string {
         type MeteorSettingsKeys = keyof MeteorSettings;
         //TODO: Dynamically get the properties that have values?

@@ -210,6 +210,10 @@ export default class MeteorDeployer {
         const command = `tar -C "${bundlePath}" -czf "${destination}" .`;
         execSync(command, {stdio: 'inherit'});
     }
+
+    //TODO: App builds but is looking for mongodb, setup local docker instance
+    //TODO: Make sure app can connect to mongo and run correctly
+    //TODO: Use deployment config to send tar to s3
 }
 
 export { MeteorDeployer };
