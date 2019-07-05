@@ -335,6 +335,27 @@ describe('MeteorDeployer.createDockerfile()', (): void => {
     });
 });
 
+describe('MeteorDeployer.dockerIsInstall', (): void => {
+    it('should return true if docker bin exists', (): void => {
+        let buffer = Buffer.from('/usr/local/bin/docker', 'utf8');
+        sinon.stub(childProcess, 'execSync').returns(buffer);
+        const deployer = new MeteorDeployer(MeteorSettingsFixture, ConfigurationFixture);
+
+        let result = deployer.dockerIsInstalled();
+
+        assert.isTrue(result, 'docker is should be considered installed when a valid path is returned');
+    });
+    it('should return false if docker bin does not exist', (): void => {
+        let buffer = Buffer.from('', 'utf8');
+        sinon.stub(childProcess, 'execSync').returns(buffer);
+        const deployer = new MeteorDeployer(MeteorSettingsFixture, ConfigurationFixture);
+
+        let result = deployer.dockerIsInstalled();
+
+        assert.isFalse(result, 'docker should not be considered installed when an empty path is returned');
+    });
+});
+
 describe('MeteorDeployer.tarBundle()', (): void => {
     it('should verify bundlePath is readable', (): void => {
         const callback = sinon.fake();
@@ -374,6 +395,7 @@ describe('MeteorDeployer.tarBundle()', (): void => {
     });
     it('should create tar with app name', (): void => {
         sinon.stub(fs, 'accessSync').callsFake(sinon.fake());
+        sinon.stub(fs, 'existsSync').returns(true);//archive created
         const callback = sinon.fake();
         sinon.stub(childProcess, 'execSync').callsFake(callback);
         const deployer = new MeteorDeployer(MeteorSettingsFixture, ConfigurationFixture);
