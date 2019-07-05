@@ -195,6 +195,11 @@ export default class MeteorDeployer {
         Logger.log(`  Docker image ${this.appName}:${tag} created`);
     }
 
+    public dockerIsInstalled(): boolean {
+        let result = execSync('which docker').toString();
+        return result.length > 1;
+    } 
+
     /**
      * 
      * @param {string} bundlePath Built bundle directory
@@ -209,11 +214,15 @@ export default class MeteorDeployer {
         const destination = path.join(this.config.buildPath, this.appName, filename);
         const command = `tar -C "${bundlePath}" -czf "${destination}" .`;
         execSync(command, {stdio: 'inherit'});
+        if(fs.existsSync(destination)){
+            Logger.log(`Archive created: ${destination}`);
+        } else {
+            Logger.log('Failed to create archive.');
+        }
     }
 
-    //TODO: App builds but is looking for mongodb, setup local docker instance
-    //TODO: Make sure app can connect to mongo and run correctly
     //TODO: Use deployment config to send tar to s3
+    
 }
 
 export { MeteorDeployer };
