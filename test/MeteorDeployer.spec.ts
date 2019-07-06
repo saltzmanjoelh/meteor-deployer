@@ -443,3 +443,19 @@ describe('MeteorDeployer.tarBundle()', (): void => {
         assert.isUndefined(result);
     });
 });
+
+describe('Meteor.performUpload()', (): void => {
+    it('should set ARCHIVE_PATH', (): void => {
+        const callback = sinon.fake();
+        sinon.stub(childProcess, 'execSync').callsFake(callback);
+        const deployer = new MeteorDeployer(MeteorSettingsFixture, ConfigurationFixture);
+        const archivePath = path.join(ConfigurationFixture.buildPath, 'build', 'archive.tar');
+        
+        deployer.performUpload(archivePath);
+
+        assert.isTrue(callback.calledOnce);
+        const command: string = callback.args[0][0];
+        assert.include(command, archivePath);
+
+    });
+});

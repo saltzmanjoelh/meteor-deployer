@@ -75,5 +75,11 @@ if(argv._.length == 0){//Only target was defined and has been removed
             deployer.dockerBuild(deployer.packageVersion());
         }
     }
+    if(argv._.includes('tar')){
+        const archivePath = deployer.tarBundle(deployer.bundlePath, deployer.config.buildPath, deployer.packageVersion());
+        if(archivePath && argv._.includes('upload')){
+            deployer.performUpload(archivePath);
+        }
+    }
 }
 
