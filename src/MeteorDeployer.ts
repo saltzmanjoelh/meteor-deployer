@@ -34,9 +34,6 @@ export default class MeteorDeployer {
     public bundlePath: string;
     public dockerfilePath: string;
     private _packageVersion: string = '0.0.0';
-    // public s3Bucket: string|undefined;
-    // private s3Key: string|undefined;
-    // private s3Secret: string|undefined;
 
     /**
      * Decodes the settings file at settingsPath into the settings property. `buildPath` is stored for use later
@@ -157,7 +154,7 @@ export default class MeteorDeployer {
         //-e "NODE_ENV=production"
         //-u "node"
         Logger.log('=> Creating Dockerfile');
-        let file = `
+        const file = `
         FROM saltzmanjoelh/meteor-alpine:latest
         ENV NODE_ENV production
 
@@ -187,7 +184,7 @@ export default class MeteorDeployer {
         fs.accessSync(this.config.buildPath, fs.constants.R_OK);
         const tagOption = `--tag ${this.appName}:${tag}`;
         let command = `docker build . ${tagOption}`;
-        let path = process.cwd();
+        const path = process.cwd();
         if(path != this.bundlePath){
             command = `cd "${this.bundlePath}" && ${command}`;
         }
@@ -196,7 +193,7 @@ export default class MeteorDeployer {
     }
 
     public dockerIsInstalled(): boolean {
-        let result = execSync('which docker').toString();
+        const result = execSync('which docker').toString();
         return result.length > 1;
     } 
 
@@ -206,7 +203,7 @@ export default class MeteorDeployer {
      * @param {string} buildPath  Root build path
      * @param {string} version Current app version number
      */
-    public tarBundle(bundlePath: string, buildPath: string, version: string): void {
+    public tarBundle(bundlePath: string, buildPath: string, version: string): string|undefined {
         Logger.log('=> Creating tar');
         fs.accessSync(bundlePath, fs.constants.R_OK);
         fs.accessSync(buildPath, fs.constants.R_OK);
@@ -214,15 +211,23 @@ export default class MeteorDeployer {
         const destination = path.join(this.config.buildPath, this.appName, filename);
         const command = `tar -C "${bundlePath}" -czf "${destination}" .`;
         execSync(command, {stdio: 'inherit'});
-        if(fs.existsSync(destination)){
-            Logger.log(`Archive created: ${destination}`);
-        } else {
+        if(fs.existsSync(destination) == false){
             Logger.log('Failed to create archive.');
+            return undefined;   
         }
+
+        Logger.log(`Archive created: ${destination}`);
+        return destination;
     }
 
     //TODO: Use deployment config to send tar to s3
-    
+    public performUpload(archivePath: string): void {
+        if(this.config.uploadAction){
+            execSync(`ARCHIVE_PATH=${archivePath} && ${this.config.uploadAction}`);
+        } else {
+            Logger.log(`You didn't provide an upload entry in ${this.config.filePath}. Add a cli action to perfom, something like\n  "upload": "aws s3 cp $ARCHIVE_PATH s3://myapp.beanstalkbucket"`)
+        }
+    }
 }
 
 export { MeteorDeployer };

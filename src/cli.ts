@@ -61,7 +61,10 @@ if(argv._.length == 0){//Only target was defined and has been removed
     if(deployer.dockerIsInstalled()){
         deployer.dockerBuild(deployer.packageVersion());
     }
-    deployer.tarBundle(deployer.bundlePath, deployer.config.buildPath, deployer.packageVersion());
+    const archivePath = deployer.tarBundle(deployer.bundlePath, deployer.config.buildPath, deployer.packageVersion());
+    if(archivePath){
+        deployer.performUpload(archivePath);
+    }
 } else {//actions were specified
     console.log('Actions => ' + argv._.join(', '));
     if(argv._.includes('build')) {

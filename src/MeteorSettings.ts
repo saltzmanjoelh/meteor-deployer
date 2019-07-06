@@ -31,9 +31,9 @@ export default class MeteorSettings {
             throw `Invalid path to meteor settings file: ${filePath}`;
         }
         Logger.log(`=> Parsing meteor settings at path: ${filePath}`);
-        let settingsPath = (path.isAbsolute(filePath))? filePath : path.join(process.cwd(), filePath);
+        const settingsPath = (path.isAbsolute(filePath))? filePath : path.join(process.cwd(), filePath);
         const json = fs.readFileSync(settingsPath, 'utf8');
-        let instance = JSON.parse(json) as MeteorSettings;
+        const instance = JSON.parse(json) as MeteorSettings;
         instance.filePath = settingsPath;
         return instance;
     }

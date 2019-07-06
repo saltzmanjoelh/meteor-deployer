@@ -337,20 +337,20 @@ describe('MeteorDeployer.createDockerfile()', (): void => {
 
 describe('MeteorDeployer.dockerIsInstall', (): void => {
     it('should return true if docker bin exists', (): void => {
-        let buffer = Buffer.from('/usr/local/bin/docker', 'utf8');
+        const buffer = Buffer.from('/usr/local/bin/docker', 'utf8');
         sinon.stub(childProcess, 'execSync').returns(buffer);
         const deployer = new MeteorDeployer(MeteorSettingsFixture, ConfigurationFixture);
 
-        let result = deployer.dockerIsInstalled();
+        const result = deployer.dockerIsInstalled();
 
         assert.isTrue(result, 'docker is should be considered installed when a valid path is returned');
     });
     it('should return false if docker bin does not exist', (): void => {
-        let buffer = Buffer.from('', 'utf8');
+        const buffer = Buffer.from('', 'utf8');
         sinon.stub(childProcess, 'execSync').returns(buffer);
         const deployer = new MeteorDeployer(MeteorSettingsFixture, ConfigurationFixture);
 
-        let result = deployer.dockerIsInstalled();
+        const result = deployer.dockerIsInstalled();
 
         assert.isFalse(result, 'docker should not be considered installed when an empty path is returned');
     });
@@ -416,5 +416,30 @@ describe('MeteorDeployer.tarBundle()', (): void => {
         assert.isTrue(callback.calledOnce);
         const command: string = callback.args[0][0];
         assert.include(command, `${deployer.appName}_${version}.tar`);
+    });
+    it('should return tar path', (): void => {
+        sinon.stub(fs, 'accessSync').callsFake(sinon.fake());
+        sinon.stub(fs, 'existsSync').returns(true);
+        const callback = sinon.fake();
+        sinon.stub(childProcess, 'execSync').callsFake(callback);
+        const deployer = new MeteorDeployer(MeteorSettingsFixture, ConfigurationFixture);
+        const version = '9.9.9';
+        
+        let result = deployer.tarBundle(deployer.bundlePath, deployer.config.buildPath, version);
+
+        assert.isNotNull(result);
+        assert.equal(result, path.join(deployer.config.buildPath, deployer.appName, `${deployer.appName}_${version}.tar`));
+    });
+    it('should return undefined if archive does not exist', (): void => {
+        sinon.stub(fs, 'accessSync').callsFake(sinon.fake());
+        sinon.stub(fs, 'existsSync').returns(false);
+        const callback = sinon.fake();
+        sinon.stub(childProcess, 'execSync').callsFake(callback);
+        const deployer = new MeteorDeployer(MeteorSettingsFixture, ConfigurationFixture);
+        const version = '9.9.9';
+        
+        let result = deployer.tarBundle(deployer.bundlePath, deployer.config.buildPath, version);
+
+        assert.isUndefined(result);
     });
 });
